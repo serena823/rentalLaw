@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import axios from "axios";
 
 const InputForm = () => {
   const [inputValue, setInputValue] = useState("");
@@ -9,9 +10,23 @@ const InputForm = () => {
     setInputValue(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setResponse(`Your legal support available: ${inputValue}`);
+    try {
+      const apiResponse = await axios.post(
+        "https://ihx4qcruvgfnyr43gl6cmypdy40luiyl.lambda-url.us-east-1.on.aws/",
+        {
+          input: inputValue,
+        }
+      );
+
+      // Extracting content from the API response
+      const content = apiResponse.data.response.choices[0].message.content;
+      setResponse(content);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setResponse("An error occurred while fetching data");
+    }
     setInputValue("");
   };
 
