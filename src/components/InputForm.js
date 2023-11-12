@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Spinner } from "react-bootstrap";
 import axios from "axios";
 
 const InputForm = () => {
   const [inputValue, setInputValue] = useState("");
   const [response, setResponse] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -12,6 +13,7 @@ const InputForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const apiResponse = await axios.post(
         "https://ihx4qcruvgfnyr43gl6cmypdy40luiyl.lambda-url.us-east-1.on.aws/",
@@ -20,14 +22,13 @@ const InputForm = () => {
         }
       );
 
-      // Extracting content from the API response
       const content = apiResponse.data.response.choices[0].message.content;
       setResponse(content);
     } catch (error) {
       console.error("Error fetching data:", error);
       setResponse("An error occurred while fetching data");
     }
-    setInputValue("");
+    setIsLoading(false);
   };
 
   return (
@@ -54,8 +55,19 @@ const InputForm = () => {
                 variant="primary"
                 type="submit"
                 className="submit-button w-100"
+                disabled={isLoading}
               >
-                Submit
+                {isLoading ? (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </Col>
           </Form.Group>
